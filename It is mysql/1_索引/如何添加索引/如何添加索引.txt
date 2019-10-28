@@ -1,0 +1,46 @@
+mysql 添加索引 mysql 如何创建索引
+ 更新时间：2012年11月26日 08:53:07   投稿：whsnow     我要评论
+
+本文将介绍mysql 如何创建索引，需要的朋友可以参考下
+1.添加PRIMARY KEY（主键索引） 
+mysql>ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` ) 
+2.添加UNIQUE(唯一索引) 
+mysql>ALTER TABLE `table_name` ADD UNIQUE ( 
+`column` 
+) 
+3.添加INDEX(普通索引) 
+mysql>ALTER TABLE `table_name` ADD INDEX index_name ( `column` ) 
+4.添加FULLTEXT(全文索引) 
+mysql>ALTER TABLE `table_name` ADD FULLTEXT ( `column`) 
+5.添加多列索引 
+mysql>ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+
+下面是更加详细的方法
+
+MySQL中可以使用alter table这个SQL语句来为表中的字段添加索引。
+
+使用alter table语句来为表中的字段添加索引的基本语法是：
+ALTER TABLE <表名> ADD INDEX (<字段>);
+
+我们来尝试为test中t_name字段添加一个索引。
+
+mysql> alter table test add index(t_name);
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+执行成功后，我们来看看结果。
+
+mysql> describe test;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| t_id       | int(11)     | YES  |     | NULL    |       |
+| t_name     | varchar(50) | NO   | MUL | NULL    |       |
+| t_password | char(32)    | YES  |     | NULL    |       |
+| t_birth    | date        | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+结果可以看出，t_name字段的Key这一栏由原来的空白变成了MUL。这个MUL是什么意思呢？简单解释一下：如果Key是MUL，那么该列的值可以重复，该列是一个非唯一索引的前导列(第一列)或者是一个唯一性索引的组成部分但是可以含有空值NULL。
+
+关于MySQL使用SQL语句为表中字段添加索引，本文就介绍这么多，希望对大家有所帮助，谢谢！

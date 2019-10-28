@@ -1,0 +1,26 @@
+----------------------------------------------------------
+将逗号分隔的字符串转换为List
+ public List removeDuplicate(List<String> list){
+        Set set = new HashSet();
+        List<String> listNew=new ArrayList<>();
+        set.addAll(list);
+        listNew.addAll(set);
+     return listNew;
+    }
+------------------------------------------------------------
+将List转换为逗号分隔的字符串
+List<String> list = new ArrayList<String>();
+list.add("a");
+list.add("b");
+list.add("c");
+// 1.使用Apache Commons的StringUtils
+String str1 = StringUtils.join(list.toArray(), ",");
+// 2.通过遍历
+StringBuffer str2 = new StringBuffer();
+for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
+    String string = (String) iterator.next();
+    str2.append(string);
+    if(iterator.hasNext()){
+        str2.append(","); 
+    }
+}

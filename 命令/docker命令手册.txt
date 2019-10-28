@@ -1,0 +1,206 @@
+启动docker
+	systemctl start docker  //centos7及以后版本
+	service docker start   //centos6及之前的版本
+---------------------------------------------------------Docker镜像操作-------------------------------------------------------
+1.搜索镜像（用来搜索远端官方仓库中的共享镜像）
+	docker search ***
+2.列出所有已经下载的镜像，
+	1.顶层镜像
+		$ docker image ls
+		$ docker images
+	2.中间层镜像
+		docker image ls -a 
+	3.虚悬镜像
+		仓库名、标签都为<none>的镜像
+		检索此类镜像	docker image ls -f dangling=true
+		删除此类镜像	docker image prune	
+	4.列出部分镜像
+		根据仓库名列出镜像	docker image ls ubuntu
+		列出指定镜像	docker image ls ubuntu:16.04
+		显示指定镜像之后的镜像列表 	docker image ls -f since=redis
+		显示镜像ID	docker image ls -q
+		查看镜像摘要	docker image ls --digests
+		某一个具体镜像的详细信息	docker inspect 48054e726fde
+	5.删除本地镜像
+		docker image rm [选项] <镜像1> [<镜像2> ...] 	<镜像>可以是镜像的ID。
+		取ID的前三个字符	docker image rm 59a 
+		使用镜像名删除	docker image rm laradock_workspace
+		删除所有仓库名为 laradock_php-fpm 的镜像
+			docker image rm $(docker image ls -q laradock_php-fpm)
+		删除所有在 redis 之前的镜像（原理同上
+			docker image rm $(docker image ls -q -f before=redis)
+	镜像、容器、数据卷所在空间	
+		docker system df	
+
+
+docker镜像的一些其他操作
+https://www.jianshu.com/p/e2ce48821824
+------------------------------------------------------Docker容器操作----------------------------------------------------------
+1.查看容器
+	docker ps -a (所有，无论是否在运行)
+	docker ps 	    (正在运行的容器)
+2.启动，关闭，进入，退出容器
+	1.是基于镜像创建一个容器并启动。
+		mysql容器:docker run --name root -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql
+		启动一个处于关闭状态的容器：docker start 48054e
+	2.是将终止状态的容器重新启动。
+	---启动
+		docker start pwc-mysql    通过指定容器名字
+		docker start 73f8811f669e   通过指定容器ID
+	3.关闭容器。
+	---关闭
+		docker stop pwc-mysql    通过指定容器名字
+		docker stop 73f8811f669e   通过指定容器ID
+	4.进入容器
+		docker exec -it d49 bash
+	5.退出容器
+		exit
+*容器中安装vim
+	1.apt-get install vim
+	2.apt-get update	--不行。
+	3.apt-get install vim
+------------------------------------------------------Docker网络----------------------------------------------------------
+1.网络类型
+	Bridge	Host	None
+2.端口映射
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------docker安装配置---------------------------------------------------
+1.安装docker（Docker 要求 CentOS 系统的内核版本高于 3.10 ）
+	yum -y install docker-io
+2.设置docker为开机自动启动
+	systemctl enable docker
+3.开启docker服务
+	systemctl start docker
+4.查看docker服务版本
+	docker version
+----------------------------------------------Docker 目录结构----------------------------------------------------
+├── containers	#用来存储容器信息
+├── image	#用来存储镜像中间件及本身信息和大小，以及依赖信息
+├── network
+├── overlay2
+├── plugins
+├── swarm
+├── tmp		 #docker临时目录
+├── trust		 #docker信任目录
+└── volumes	 #docker卷目录
+
+----------------------------------------------Docker 修改默认存储路径-------------------------------------------
+docker 默认的存储路径在 /var/lib/docker下面。
+1.修改docker的systemd的 docker.service的配置文件
+不知道 配置文件在哪里可以使用systemd 命令显示一下.
+systemctl disable docker
+systemctl enable docker
+2. 修改docker.service文件.
+vim /usr/lib/systemd/system/docker.service
+3.EXECStart的后面增加自定义路径
+	ExecStart=/usr/bin/dockerd 
+		--graph /home/docker
+4.然后重新加载配置文件
+
+  systemctl daemon-reload
+
+  最后重启即可
+
+  systemctl restart docker
+5.docker info 验证 docker默认存储路径是否修改
+
+Docker Root Dir: /home/docker
+---------------------------------------------------Docker 修改镜像源--------------------------------------------
+1.vi修改 /etc/docker/daemon.json
+添加上"registry-mirrors": ["https://registry.docker-cn.com"] 
+
+{
+        "registry-mirrors":["https://kfwkfulq.mirror.aliyuncs.com"]
+}
+
+2.重载守护进程文件，重启 docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+3.查看加速器是否生效
+[root@txyun ~]# docker info
+...
+Registry Mirrors:
+ https://y0qd36iq.mirror.aliyuncs.com   
+...
+----------------------------------------------------Docker 搭建mysql服务-----------------------------------------
+https://www.cnblogs.com/pwc1996/p/5425234.html
+http://www.cnblogs.com/linjiqin/p/8618635.html
+1.拉取MySQL镜像
+	docker pull mysql
+2.拉取成功后我们查看一下
+	docker images 或者 docker image ls
+3.默认的配置下创建并启动一个MySQL容器
+	docker run --name root -e MYSQL_ROOT_PASSWORD=123456 -p 3307:3306 -d mysql
+		–name：给新创建的容器命名，此处命名为pwc-mysql
+		-e：配置信息，此处配置mysql的root用户的登陆密码
+		-p：端口映射，此处映射主机3307端口到容器pwc-mysql的3306端口
+		-d：成功启动容器后输出容器的完整ID，例如上图 73f8811f669ee...容器在在后台一直运行
+		最后一个mysql指的是mysql镜像名字
+	*如果启动容器报错：exec: "docker-proxy": executable file not found in $PATH，可知，启动需要执	行/usr/bin/docker-proxy 解决：
+	1.查看下 docker-proxy 的位置：
+	 cat /usr/lib/systemd/system/docker.service | grep prox
+	2.创建一条软连接到 /usr/bin/ 下：
+	ln -s /usr/libexec/docker/docker-proxy-current /usr/bin/docker-proxy 再重新执行启动容器操作。
+	*如果启动容器报错：Error response from daemon: shim error: docker-runc not installed on system.
+	1.cd /usr/libexec/docker/
+	2.ln -s docker-runc-current docker-runc   再重启容器。
+4.查看容器运行状态
+	sudo docker ps
+	可以看到容器的简写ID，容器的源镜像，创建时间，状态，端口映射信息，容器名字等。则启动容器成功。
+5.navicat远程连接测试连接MySQL
+	需开放宿主机相应端口或关闭防火墙。
+
+	如果链接不上:
+	1.进入刚启动的mysql容器。
+	docker exec -ti 2f5ee2707629 /bin/bash
+	2.登录mysql
+	mysql -u root -poWkficcnGC27(-u后面可以加空格，-p后面跟密码时一定不要加空格！否则会报错，uknow database***)
+	3.修改root 可以通过任何客户端连接
+	ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';---结束。
+***TODO mysql 1.（默认配置路径）2.容器指定配置启动。3.删除mysql相关的一切。4.docker oracle
+----------------------------------------------------Docker 搭建nginx服务---------------------------------------------
+1.查找 Docker Hub 上的 nginx 镜像
+	docker search nginx
+2.拉取官方的镜像
+	docker pull nginx
+3.使用 NGINX 默认的配置来启动一个 Nginx 容器实例
+	docker run --name runoob-nginx-test -p 8081:80 -d nginx
+----------------------------------------------------Docker 搭建tomcat服务---------------------------------------------
+
+-------------------------------------------docker 容器中安装vim--------------------------------------------------------
+在使用docker容器时，有时候里边没有安装vim，敲vim命令时提示说：vim: command not found，这个时候就需要安装vim，可是当你敲apt-get install vim命令时，提示：
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+E: Unable to locate package vim
+这时候需要敲：
+
+apt-get update
+ 
+
+，这个命令的作用是：同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包。
+等更新完毕以后再敲命令：
+
+apt-get install vim
+
+

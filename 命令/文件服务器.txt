@@ -1,0 +1,35 @@
+清理本地yum缓存  yum clean all
+
+1. docker search vsftpd         #寻找vsftpd的镜像
+ 
+#假如我们找到一个最多引用的，叫fauria/vsftpd
+ 
+2. docker pull fauria/vsftpd  #把镜像pull到本地
+
+3.启动镜像
+
+
+docker run -d -p 21:21 -p 20:20 -p 21100-21110:21100-21110 -v /data/docker/ftpserver/ftpFile:/home/vsftpd -e FTP_USER=user -e FTP_PASS=123456 -e PASV_ADDRESS=39.106.80.203 -e PASV_MIN_PORT=21100 -e PASV_MAX_PORT=21110 --name vsftpd --restart=always fauria/vsftpd
+
+4.修改、完善vsftpd的设置
+#1、我们先进入container里面
+ 
+docker exec -i -t vsftpd bash 
+ 
+#2、修改并生成虚拟用户模式下的用户db文件
+ 
+vi /etc/vsftpd/virtual_users.txt #编辑配置文件写入用户跟密码
+ 
+#假如我们添加了user用户
+ 
+mkdir /home/vsftpd/user #建立新用户文件夹 
+ 
+/usr/bin/db_load -T -t hash
+ -f /etc/vsftpd/virtual_users.txt /etc/vsftpd/virtual_users.db
+ #把登录的验证信息写入数据库
+
+5.docker restart vsftpd
+
+ 
+
+

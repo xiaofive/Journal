@@ -1,0 +1,19 @@
+mysql清空表可以用delete和truncate两个命令来完成：
+
+     1. delete
+
+         ① 语法：delete from table_name；
+
+         ② 示例：DELETE FROM `order`;
+
+     2. truncate
+
+         ① 语法：truncate table table_name；
+
+         ② 示例：TRUNCATE TABLE `order`;
+
+    3. 区别
+
+        ① 使用delete清空表中的记录，内容的ID仍然从删除点的ID继续建立，而不是从1开始。而truncate相当于保留了表的结构而重新建立了一张同样的新表。delete的效果有点像将mysql表中所有记录一条一条删除到删完。
+
+        ② 效率上truncate比delete快。但truncate删除后不记录mysql日志，不可以恢复数据。

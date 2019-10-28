@@ -1,0 +1,30 @@
+ $(document).ready(function () {
+
+        // get birthday & age
+        $("#idCardNo").change(function () {
+            var idCardNo = $(this).val();
+            if (idCardNo.length < 15) {
+                alert("不对。请再输入身份证号码。 ");
+                $(this).val("");
+                return;
+            }
+
+            var year = idCardNo.substring(6, 10);
+            var month = idCardNo.substring(10, 12);
+            var day = idCardNo.substring(12, 14);
+            if (isNaN(year) || isNaN(month) || isNaN(day) ||
+                    parseInt(year) < 1900 || parseInt(year) > 2100 ||
+                    parseInt(month) < 1 || parseInt(month) > 12 ||
+                    parseInt(day) < 1 || parseInt(day) < 1 || parseInt(day) > 30) {
+                alert("不对。请再输入身份证号码。 ");
+                $(this).val("");
+                return false;
+            }
+            else {
+                $("#birthday").val(year + "/" + month + "/" + day);
+
+                var curDate = new Date();
+                $("#age").val(curDate.getFullYear() - year);
+            }
+        });
+    });

@@ -1,0 +1,7 @@
+ public List removeDuplicate(List<String> list){
+        Set set = new HashSet();
+        List<String> listNew=new ArrayList<>();
+        set.addAll(list);
+        listNew.addAll(set);
+     return listNew;
+    }

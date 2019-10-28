@@ -1,0 +1,10 @@
+   public static String getUrl(Map <String,Object>map){
+        StringBuffer sb = new StringBuffer();
+        Set<String> keys = map.keySet();
+        for(String key: keys){
+            sb.append("&"+key+"={"+key+"}");
+        }
+
+        String url = sb.toString().replaceFirst("&","?");
+        return url;
+    }

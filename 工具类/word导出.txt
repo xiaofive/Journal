@@ -1,0 +1,27 @@
+返回一个链接 ,<a>标签模拟点击。 $("#exportWord")[0] 获取<a>标签dom对象。
+
+<a  style="display: none;" id="exportWord"></a>
+
+function eventExport() {
+        var eventId = $("#eventId").val()
+         $.modal.confirm("确定要打印该事件吗?", function () {
+            var url = ctx + "msjb/mobileEvent/export";
+            var data = {
+                "eventId": eventId,
+            };
+            $.ajax({
+                url: url,
+                type: "get",
+                dataType: "json",
+                data: data,
+                success: function(result) {
+                    if (result.code === 0){
+                        var download = $("#exportWord")[0]	
+                        download.setAttribute('href',result.msg);
+                        download.setAttribute('download',"2"); //设置文件名称
+                        download.click();
+                    }
+                }
+            });
+         })
+    }

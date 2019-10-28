@@ -1,0 +1,11 @@
+centos7在upgrade的时候显示：Delta RPMs disabled....详见内容？
+
+# yum provides '*/applydeltarpm'
+# yum install deltarpm
+另外如果出现 No Presto metadata available for base. 的话 try
+
+
+# yum provides '*/applydeltarpm'
+And
+
+# yum install deltarpm
